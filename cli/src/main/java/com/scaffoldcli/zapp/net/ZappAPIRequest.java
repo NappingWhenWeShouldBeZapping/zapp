@@ -4,8 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.scaffoldcli.zapp.lib.Text;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -19,25 +17,22 @@ import static com.scaffoldcli.zapp.auth.AuthDetails.getAccessToken;
 import static com.scaffoldcli.zapp.auth.AutheticateUser.triggerUserAutheticationFlow;
 
 public class ZappAPIRequest {
+    private static String authToken;
     private final String baseURL = "http://localhost:8002/";
     private final HttpClient client = HttpClient.newHttpClient();
     private final Gson gson = new GsonBuilder()
             .setPrettyPrinting()
             .disableHtmlEscaping()
             .create();
-    @Getter
-    @Setter
-    private String authToken;
 
     public ZappAPIRequest() {
     }
 
-    private void checkUserAuth() {
-        String authToken = getAccessToken();
+    public static void checkUserAuth() {
         if (authToken == null || authToken.isEmpty()) {
             triggerUserAutheticationFlow();
+            authToken = getAccessToken();
         }
-        this.authToken = authToken;
     }
 
     public HttpResponse<String> get(String endpoint) {
@@ -62,8 +57,6 @@ public class ZappAPIRequest {
     }
 
     public HttpResponse<String> post(String endpoint, String body) {
-        checkUserAuth();
-
         endpoint = replaceFirstSlash(endpoint);
 
         Map<String, Object> req = convertJsonStringToMap(body);

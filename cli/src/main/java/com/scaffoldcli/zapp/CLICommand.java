@@ -3,10 +3,14 @@ package com.scaffoldcli.zapp;
 import com.scaffoldcli.zapp.commands.AICliCommand;
 import com.scaffoldcli.zapp.commands.CreateScaffCommand;
 import com.scaffoldcli.zapp.commands.Init;
+import com.scaffoldcli.zapp.lib.Text;
+import com.scaffoldcli.zapp.net.ZappAPIRequest;
 import org.springframework.shell.component.view.TerminalUIBuilder;
 import org.springframework.shell.standard.AbstractShellComponent;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
+
+import static com.scaffoldcli.zapp.net.ZappAPIRequest.checkUserAuth;
 
 // Much pain was suffered getting this bullshit to work
 // For future reference, the holy comment which saved the day:
@@ -32,6 +36,7 @@ public class CLICommand extends AbstractShellComponent {
 
     @ShellMethod
     public void create() {
+        checkUserAuth();
         CreateScaffCommand cli = new CreateScaffCommand();
         cli.run();
     }

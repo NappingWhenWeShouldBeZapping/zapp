@@ -7,7 +7,7 @@ import java.nio.file.InvalidPathException;
 import java.nio.file.Paths;
 
 public class AuthDetails {
-    private static final String accessTokenFilePath = System.getProperty("user.home") + File.pathSeparator + "ZappAccessToken.txt";
+    private static final String accessTokenFilePath = System.getProperty("user.home") +  "\\ZappAccessToken.txt";
     private static String accessToken = null;
 
     public static String getAccessToken() {
