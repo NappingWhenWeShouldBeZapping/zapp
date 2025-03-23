@@ -7,34 +7,48 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.io.IOException;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.scaffoldcli.zapp.auth.AuthDetails;
 import com.scaffoldcli.zapp.auth.AutheticateUser;
+import com.scaffoldcli.zapp.auth.GoogleAuthValidator;
 
 @ExtendWith(MockitoExtension.class)
 class AutheticateUserTest {
 
-    @Test
-    void testIsUserAuthenticated() throws IOException {
-        String tokenPath = ZappApplication.AccessTokenFilePath;
+    private final String dummyToken = "DummyToken";
 
+    @BeforeEach
+    void setUp() throws IOException {
+        // Mock the access token file if needed
+        String tokenPath = "DummyAccessToken.txt";
         if (tokenPath != null && !Files.exists(Paths.get(tokenPath))) {
             Files.createFile(Paths.get(tokenPath));
         }
+    }
 
-        Files.writeString(Paths.get(tokenPath), "dummyAccessToken");
-        try (MockedStatic<AutheticateUser> mockedStatic = mockStatic(AutheticateUser.class)) {
-            mockedStatic.when(AutheticateUser::triggerUserAutheticationFlow).thenAnswer(invocation -> {
-                return null;
-            });
-            mockedStatic.when(AutheticateUser::authenticateUser).thenReturn(true);
+    @Test
+    void testIsUserAuthenticated() throws IOException {
+        try (
+            MockedStatic<AuthDetails> authDetailsMock = mockStatic(AuthDetails.class);
+            MockedStatic<GoogleAuthValidator> googleAuthMock = mockStatic(GoogleAuthValidator.class)
+        ) {
+            // Mock static methods
+            authDetailsMock.when(AuthDetails::getAccessToken).thenReturn(dummyToken);
+            googleAuthMock.when(() -> GoogleAuthValidator.isValidGoogleToken(dummyToken)).thenReturn(true);
 
+            // Set access token
+            AuthDetails.setAccessToken(dummyToken); // Ensure it is properly set
+
+            // Call the method
             boolean isAuthenticated = AutheticateUser.isUserAutheticated();
 
-            assertFalse(isAuthenticated);
+            // Assertion (change to `assertTrue(isAuthenticated);` if expected to be authenticated)
+            assertTrue(isAuthenticated);
         }
     }
 }

@@ -20,7 +20,7 @@ public class AuthenticateUser {
         userService = service;
     }
 
-    public static Boolean getUserInfo(String accessToken) {
+    public static boolean getUserInfo(String accessToken) {
         String userInfoUrl = "https://www.googleapis.com/oauth2/v3/userinfo";
 
         RestTemplate restTemplate = new RestTemplate();

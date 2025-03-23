@@ -10,7 +10,7 @@ import lombok.*;
 @AllArgsConstructor
 public class Tag {
     @Id
-    private Integer id;
+    private int id;
 
     @Column(nullable = false, unique = true)
     private String label;

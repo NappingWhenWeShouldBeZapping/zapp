@@ -1,12 +1,8 @@
 package com.scaffoldcli.zapp.auth;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
-import org.springframework.web.client.RestTemplate;
-
-import com.scaffoldcli.zapp.ZappApplication;
+import com.scaffoldcli.zapp.ServerAccess.AppUrls;
 
 public class AutheticateUser {
 
@@ -24,43 +20,29 @@ public class AutheticateUser {
     }
 
     @SuppressWarnings("deprecation")
-    public static Boolean authenticateUser(){
+    public static boolean authenticateUser(){
         try {
-            Runtime.getRuntime().exec("cmd /c \"start " + ZappApplication.ClientUrl + "\"");
+            Runtime.getRuntime().exec("cmd /c \"start " + AppUrls.getClient() + "\"");
             Integer tryCount = 30;
             while (!isUserAutheticated() && tryCount > 0) {
                 --tryCount;	
             }
             if (isUserAutheticated()) {
-                Runtime.getRuntime().exec("cmd /c \"start " + ZappApplication.ClientUrl + "login/success\"");
+                Runtime.getRuntime().exec("cmd /c \"start " + AppUrls.getClient() + "login/success\"");
             } else {
                 System.err.println("Authentication failed after multiple attempts.");
                 System.exit(1);
             }
-        } catch (IOException e) {
+        } catch (IOException | SecurityException e) {
             System.err.println("Please authenticate your google account");
             System.exit(1);
         }
         return isUserAutheticated();
     }
 
-    public static Boolean isUserAutheticated () {
+    public static boolean isUserAutheticated () {
         try { Thread.sleep(2000); } catch (InterruptedException e) { /* zzZZ */ };
 
-        if (ZappApplication.AccessToken == null){
-            try{
-                ZappApplication.AccessToken = Files.readString(Paths.get(ZappApplication.AccessTokenFilePath));
-            } catch (IOException e) {
-                return false;
-            }
-        }
-        String userInfoUrl = "https://www.googleapis.com/oauth2/v3/userinfo";
-        RestTemplate restTemplate = new RestTemplate();
-        try {
-            restTemplate.getForObject(userInfoUrl + "?access_token=" + ZappApplication.AccessToken, String.class);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
+        return GoogleAuthValidator.isValidGoogleToken(AuthDetails.getAccessToken());
     }
 }

@@ -15,6 +15,7 @@ public class Create {
     private static final List<FileData> fileDataList = new ArrayList<>();
     private static final Map<String, Object> jsonMap = new HashMap<>();
     private static final Scanner scanner = new Scanner(System.in);
+    private static ServerAccessHandler serverAccessHandler = new ServerAccessHandler();
 
     private static final Set<String> IGNORED_EXTENSIONS = new HashSet<>(Arrays.asList(
             "bin", "exe", "dll", "class", "jpg", "jpeg", "png", "gif", "bmp", "mp3", "mp4", "avi", "zip", "tar", "gz",
@@ -126,7 +127,7 @@ public class Create {
 
         String json = gson.toJson(jsonMap);
 
-        ServerAccessHandler.createScaffServerRequest(json);
+        serverAccessHandler.createScaffServerRequest(json);
     }
 
     public static String getScaffName() {
