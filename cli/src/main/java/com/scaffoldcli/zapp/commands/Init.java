@@ -111,7 +111,7 @@ public class Init implements Command {
         this.itemToScaff = new HashMap<String, String>();
 
         Text.print("Waiting for server response...", Colour.bright_yellow, true);
-        HttpResponse<String> response = new ZappAPIRequest().get("/scaff");
+        HttpResponse<String> response = new ZappAPIRequest().get("/scaff/");
 
         this.items = GetScaffsResponse.fromJson(response.body());
 
