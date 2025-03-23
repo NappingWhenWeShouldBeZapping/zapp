@@ -8,7 +8,6 @@ public class AppUrls {
     private static String serverDomain;
 
     private static final String client = "http://localhost:8001/";
-    private static final String server="http://localhost:8002/";
     private static final String googleTokenInfo = "https://oauth2.googleapis.com/tokeninfo?access_token=";
 
     public static String getClient(){

@@ -2,6 +2,7 @@ package com.scaffoldcli.zapp;
 
 import com.scaffoldcli.zapp.auth.AutheticateUser;
 import com.scaffoldcli.zapp.commands.CreateScaffCommand;
+import com.scaffoldcli.zapp.commands.GeminiProjectSpecificationShell;
 import com.scaffoldcli.zapp.commands.Init;
 import com.scaffoldcli.zapp.lib.Text;
 import com.scaffoldcli.zapp.net.ZappAPIRequest;
@@ -36,6 +37,13 @@ public class CLICommand extends AbstractShellComponent {
     public void create() {
         AutheticateUser.triggerUserAutheticationFlow();
         CreateScaffCommand cli = new CreateScaffCommand();
+        cli.run();
+    }
+
+    @ShellMethod
+    public void gemini() {
+        AutheticateUser.triggerUserAutheticationFlow();
+        GeminiProjectSpecificationShell cli = new GeminiProjectSpecificationShell();
         cli.run();
     }
 
