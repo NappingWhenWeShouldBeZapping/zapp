@@ -3,7 +3,7 @@ package com.scaffoldcli.zapp.net;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import com.scaffoldcli.zapp.auth.AppUrls;
+import com.scaffoldcli.zapp.ServerAccess.AppUrls;
 import com.scaffoldcli.zapp.auth.AuthDetails;
 import com.scaffoldcli.zapp.auth.AutheticateUser;
 import com.scaffoldcli.zapp.lib.Text;

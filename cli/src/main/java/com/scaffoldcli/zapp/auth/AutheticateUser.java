@@ -1,5 +1,6 @@
 package com.scaffoldcli.zapp.auth;
 
+import com.scaffoldcli.zapp.ServerAccess.AppUrls;
 import com.scaffoldcli.zapp.lib.Text;
 import com.scaffoldcli.zapp.lib.Text.Colour;
 
