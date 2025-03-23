@@ -12,10 +12,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.scaffoldcli.zapp.auth.AutheticateUser;
+import com.scaffoldcli.zapp.auth.AuthenticateUser;
 
 @ExtendWith(MockitoExtension.class)
-class AutheticateUserTest {
+class AuthenticateUserTest {
 
     @Test
     void testIsUserAuthenticated() throws IOException {
@@ -26,13 +26,13 @@ class AutheticateUserTest {
         }
 
         Files.writeString(Paths.get(tokenPath), "dummyAccessToken");
-        try (MockedStatic<AutheticateUser> mockedStatic = mockStatic(AutheticateUser.class)) {
-            mockedStatic.when(AutheticateUser::triggerUserAutheticationFlow).thenAnswer(invocation -> {
+        try (MockedStatic<AuthenticateUser> mockedStatic = mockStatic(AuthenticateUser.class)) {
+            mockedStatic.when(AuthenticateUser::triggerUserAuthenticationFlow).thenAnswer(invocation -> {
                 return null;
             });
-            mockedStatic.when(AutheticateUser::authenticateUser).thenReturn(true);
+            mockedStatic.when(AuthenticateUser::authenticateUser).thenReturn(true);
 
-            boolean isAuthenticated = AutheticateUser.isUserAutheticated();
+            boolean isAuthenticated = AuthenticateUser.isUserAuthenticated();
 
             assertFalse(isAuthenticated);
         }
