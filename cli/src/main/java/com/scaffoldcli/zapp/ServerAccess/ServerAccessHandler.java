@@ -1,7 +1,7 @@
 package com.scaffoldcli.zapp.ServerAccess;
 
 import com.scaffoldcli.zapp.ZappApplication;
-import com.scaffoldcli.zapp.auth.AutheticateUser;
+import com.scaffoldcli.zapp.auth.AuthenticateUser;
 import org.springframework.http.*;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
@@ -31,10 +31,10 @@ public class ServerAccessHandler {
         } catch (HttpClientErrorException e) {
             System.out.println("\n\t\u001B[93m> You are not authenticated - polling for auth\u001B[0m");
             if (e.getStatusCode() == HttpStatus.UNAUTHORIZED) {
-                AutheticateUser.triggerUserAutheticationFlow();
+                AuthenticateUser.triggerUserAuthenticationFlow();
                 boolean authenticated = false;
                 for (int i = 0; i < 30 && !authenticated; i++) {
-                    if (AutheticateUser.isUserAutheticated()) authenticated = true;
+                    if (AuthenticateUser.isUserAuthenticated()) authenticated = true;
                 }
                 if (authenticated) {
                     System.out.println("\n\n\t\u001B[92m> Authenticated - launching CLI\u001B[0m\n\n");
@@ -72,10 +72,10 @@ public class ServerAccessHandler {
 
     public static void createScaffServerRequest(String jsonBody) {
         try {
-            AutheticateUser.triggerUserAutheticationFlow();
+            AuthenticateUser.triggerUserAuthenticationFlow();
             boolean authenticated = false;
             for (int i = 0; i < 30 && !authenticated; i++) {
-                if (AutheticateUser.isUserAutheticated()) authenticated = true;
+                if (AuthenticateUser.isUserAuthenticated()) authenticated = true;
             }
             if (authenticated) {
                 System.out.println("\n\n\t\u001B[92m> Authenticated - launching CLI\u001B[0m\n\n");

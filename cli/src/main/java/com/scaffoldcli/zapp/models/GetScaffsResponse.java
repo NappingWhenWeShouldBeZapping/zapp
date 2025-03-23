@@ -30,7 +30,6 @@ public class GetScaffsResponse {
         return gson.fromJson(json, listType);
     }
 
-    // Getters and setters (optional)
     public String getId() {
         return id;
     }
@@ -58,7 +57,6 @@ public class GetScaffsResponse {
         @SerializedName("email")
         private String email;
 
-        // Getters and setters (optional)
         public String getUsername() {
             return username;
         }
