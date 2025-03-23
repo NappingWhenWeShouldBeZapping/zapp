@@ -2,6 +2,7 @@
 *.log.*
 *.log/*
 .idea/
+bin/
 .vscode/
 /terraform/.terraform.lock.hcl
 /terraform/.terraform/

@@ -13,12 +13,16 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 @RestController
@@ -59,6 +63,31 @@ public class ScaffController {
         this.userService = userService;
     }
 
+    private static String byteToHex(final byte[] hash)
+    {
+        Formatter formatter = new Formatter();
+        for (byte b : hash) { formatter.format("%02x", b); }
+        String result = formatter.toString();
+        formatter.close();
+        return result;
+    }
+
+    private static String hashSha1(String digest)
+    {
+        String sha1 = "";
+        try
+        {
+            MessageDigest crypt = MessageDigest.getInstance("SHA-1");
+            crypt.reset();
+            crypt.update(digest.getBytes("UTF-8"));
+            sha1 = byteToHex(crypt.digest());
+        }
+        catch(NoSuchAlgorithmException e) { e.printStackTrace(); }
+        catch(UnsupportedEncodingException e) { e.printStackTrace(); }
+
+        return sha1;
+    }
+
     private static List<Map<String, String>> getInsertions(Object obj) {
         if (obj instanceof List<?> list) {
             if (!list.isEmpty() && list.get(0) instanceof Map<?, ?>) {
@@ -85,33 +114,40 @@ public class ScaffController {
         String scaffName;
         String scaffDescr;
 
-        if (parent.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
+        //---------- Gather metadata ----------//
+        if (parent.isEmpty()) { return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null); }
+        Optional<User> user = userService.getUserByEmail(AuthenticateUser.getEmail());
+        if (user.isEmpty()) { return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null); }
 
         try {
             scaffName = requestData.get("scaffName").toString();
             scaffDescr = requestData.get("scaffDescr").toString();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-        }
+        } catch (Exception e) { return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null); }
 
         List<Map<String, String>> insertions = getInsertions(requestData.get("insertions"));
 
+        //---------- Create new scaff ----------//
+        Scaff _scaff = new Scaff();
+
+        String scaffRepresentative = new StringBuilder()
+        .append(parent.get().getParent() + "|")
+        .append(user.get().getEmail() + "|")
+        .append(scaffName + "|")
+        .append(scaffDescr + "|")
+        .toString();
+
+        // String id = hashSha1(scaffRepresentative).substring(0, 31);
+        // _scaff.setId(id);
+
+        _scaff.setId(UUID.randomUUID().toString().replace("-", ""));
+        _scaff.setParent(parent.get());
+        _scaff.setAuthor(user.get());
+        _scaff.setName(scaffName);
+        _scaff.setDescr(scaffDescr);
+        Scaff scaff = scaffService.saveScaff(_scaff);
+
+        //---------- Create insertions ----------//
         for (Map<String, String> item : insertions) {
-            Scaff _scaff = new Scaff();
-            Optional<User> user = userService.getUserByEmail(AuthenticateUser.getEmail());
-
-            if (user.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-            }
-
-            _scaff.setId(UUID.randomUUID().toString().replace("-", ""));
-            _scaff.setParent(parent.get());
-            _scaff.setAuthor(user.get());
-            _scaff.setName(scaffName);
-            _scaff.setDescr(scaffDescr);
-            Scaff scaff = scaffService.saveScaff(_scaff);
 
             Insertion _insertion = new Insertion();
             _insertion.setId(UUID.randomUUID().toString().replace("-", ""));
@@ -120,9 +156,7 @@ public class ScaffController {
             _insertion.setValue(item.get("content"));
 
             boolean created = insertionService.saveInsertion(_insertion);
-            if (!created) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-            }
+            if (!created) { return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); }
         }
         return ResponseEntity.status(HttpStatus.CREATED).body(null);
     }

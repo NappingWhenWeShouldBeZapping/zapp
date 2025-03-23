@@ -14,7 +14,7 @@ public class AutheticateUser {
         if(!isUserAutheticated()){ 
             System.out.println("You are not autheticated. Open your brower to login...");
             if(authenticateUser()){
-                System.out.println("Your are now logged in.");
+                System.out.println("You are now logged in.");
             }
             else {
                 System.out.println("We could not log you in, please try again.");
