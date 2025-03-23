@@ -12,6 +12,6 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(@NonNull InterceptorRegistry registry) {
         // Add authentication interceptor to verify access token on each request
-        registry.addInterceptor(new AuthInterceptor()).addPathPatterns("/scaf/**");
+        registry.addInterceptor(new AuthInterceptor()).addPathPatterns("/scaff/**");
     }
 }
