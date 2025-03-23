@@ -14,7 +14,6 @@ public class ZappApplication {
 		//========== Spring init ==========//
 		SpringApplication application = new SpringApplication(ZappApplication.class);
 		application.setBannerMode(Mode.OFF);
-		// application.setLogStartupInfo(false);
 		application.run(args);
 	}
 }

@@ -1,12 +1,16 @@
 package com.scaffoldcli.zapp;
 
 import com.scaffoldcli.zapp.commands.AICliCommand;
+import com.scaffoldcli.zapp.commands.CreateScaffCommand;
 import com.scaffoldcli.zapp.commands.Init;
-import com.scaffoldcli.zapp.commands.Create;
+import com.scaffoldcli.zapp.lib.Text;
+import com.scaffoldcli.zapp.net.ZappAPIRequest;
 import org.springframework.shell.component.view.TerminalUIBuilder;
 import org.springframework.shell.standard.AbstractShellComponent;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
+
+import static com.scaffoldcli.zapp.net.ZappAPIRequest.checkUserAuth;
 
 // Much pain was suffered getting this bullshit to work
 // For future reference, the holy comment which saved the day:
@@ -18,30 +22,29 @@ import org.springframework.shell.standard.ShellMethod;
 @ShellComponent
 public class CLICommand extends AbstractShellComponent {
 
-	private final TerminalUIBuilder terminalUIBuilder;
+    private final TerminalUIBuilder terminalUIBuilder;
 
-	public CLICommand(TerminalUIBuilder terminalUIBuilder) {
-		this.terminalUIBuilder = terminalUIBuilder;
-	}
+    public CLICommand(TerminalUIBuilder terminalUIBuilder) {
+        this.terminalUIBuilder = terminalUIBuilder;
+    }
 
-	@ShellMethod
-	public void init() {
-		Init cli = new Init(terminalUIBuilder);
-		cli.run();
-	}
+    @ShellMethod
+    public void init() {
+        Init cli = new Init(terminalUIBuilder);
+        cli.run();
+    }
 
-	@ShellMethod
-	public void create() {
-		Create cli = new Create();
-		cli.run();
-	}
+    @ShellMethod
+    public void create() {
+        checkUserAuth();
+        CreateScaffCommand cli = new CreateScaffCommand();
+        cli.run();
+    }
 
-	@ShellMethod
-	public void ai() {
-		AICliCommand aiCli = new AICliCommand(terminalUIBuilder);
-
-		aiCli.init();
-
-	}
+    @ShellMethod
+    public void ai() {
+        AICliCommand aiCli = new AICliCommand(terminalUIBuilder);
+        aiCli.init();
+    }
 
 }

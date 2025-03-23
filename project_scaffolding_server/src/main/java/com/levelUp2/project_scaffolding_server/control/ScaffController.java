@@ -1,6 +1,5 @@
 package com.levelUp2.project_scaffolding_server.control;
 
-import com.levelUp2.project_scaffolding_server.AuthenticateUser;
 import com.levelUp2.project_scaffolding_server.db.entity.Insertion;
 import com.levelUp2.project_scaffolding_server.db.entity.Scaff;
 import com.levelUp2.project_scaffolding_server.db.entity.User;
@@ -8,6 +7,7 @@ import com.levelUp2.project_scaffolding_server.db.service.InsertionService;
 import com.levelUp2.project_scaffolding_server.db.service.ScaffService;
 import com.levelUp2.project_scaffolding_server.db.service.UserService;
 import com.levelUp2.project_scaffolding_server.lib.fs.FileSystem;
+import com.levelUp2.project_scaffolding_server.models.CreateScaffRequest;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
@@ -15,10 +15,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.*;
 
 @RestController
@@ -59,13 +55,11 @@ public class ScaffController {
         this.userService = userService;
     }
 
-    private static List<Map<String, String>> getInsertions(Object obj) {
+    @SuppressWarnings("unchecked")
+    private static List<CreateScaffRequest.Insertion> getInsertions(Object obj) {
         if (obj instanceof List<?> list) {
-            if (!list.isEmpty() && list.get(0) instanceof Map<?, ?>) {
-                @SuppressWarnings("unchecked")
-                List<Map<String, String>> insertions = (List<Map<String, String>>) list;
-
-                return insertions;
+            if (!list.isEmpty() && list.getFirst() instanceof Map<?, ?>) {
+                return (List<CreateScaffRequest.Insertion>) list;
             } else {
                 System.out.println("The elements in the list are not Map<String, String>");
             }
@@ -73,51 +67,46 @@ public class ScaffController {
         return null;
     }
 
-    @GetMapping
+    @GetMapping(path = "/", produces = "application/json")
     public List<Scaff> getAllScaffs() {
-        return scaffService.getAllScaffs();
+        return scaffService.getAllParentScaffs();
     }
 
-    @PostMapping("/create")
-    public ResponseEntity<Scaff> createScaff(@RequestBody Map<String, Object> requestData) {
-        String parentId = "00000000000000000000000000000000";
-        Optional<Scaff> parent = scaffService.getScaffById(parentId);
-        String scaffName;
-        String scaffDescr;
+    @PostMapping(path = "/", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Scaff> createScaff(@RequestBody CreateScaffRequest requestData) {
+        String parentId;
 
+        if (requestData.getParentId() == null || requestData.getParentId().isBlank()) {
+            parentId = "00000000000000000000000000000000";
+        } else {
+            parentId = requestData.getParentId();
+        }
+
+        Optional<Scaff> parent = scaffService.getScaffById(parentId);
         if (parent.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
 
-        try {
-            scaffName = requestData.get("scaffName").toString();
-            scaffDescr = requestData.get("scaffDescr").toString();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-        }
-
-        List<Map<String, String>> insertions = getInsertions(requestData.get("insertions"));
-
-        for (Map<String, String> item : insertions) {
-            Scaff _scaff = new Scaff();
-            Optional<User> user = userService.getUserByEmail(AuthenticateUser.getEmail());
+        for (CreateScaffRequest.Insertion item : requestData.getInsertions()) {
+            Optional<User> user = userService.getUserByEmail("user1@example.com");
 
             if (user.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
             }
 
+            Scaff _scaff = new Scaff();
             _scaff.setId(UUID.randomUUID().toString().replace("-", ""));
             _scaff.setParent(parent.get());
             _scaff.setAuthor(user.get());
-            _scaff.setName(scaffName);
-            _scaff.setDescr(scaffDescr);
+            _scaff.setName(requestData.getScaffName());
+            _scaff.setDescr(requestData.getScaffDescr());
             Scaff scaff = scaffService.saveScaff(_scaff);
 
             Insertion _insertion = new Insertion();
             _insertion.setId(UUID.randomUUID().toString().replace("-", ""));
             _insertion.setScaff(scaff);
-            _insertion.setFilepath(item.get("relativePath"));
-            _insertion.setValue(item.get("content"));
+            _insertion.setFilepath(item.getRelativePath());
+            _insertion.setValue(item.getContent());
 
             boolean created = insertionService.saveInsertion(_insertion);
             if (!created) {
@@ -138,8 +127,12 @@ public class ScaffController {
     }
 
     @GetMapping("/{id}/options")
-    public Map<String, Scaff> getOptions(@PathVariable String id) {
-        return scaffService.getScaffChildren(id);
+    public ResponseEntity getOptions(@PathVariable String id) {
+        Map<String, Scaff> scaffMap = scaffService.getScaffChildren(id);
+        if (scaffMap == null || scaffMap.isEmpty()) {
+            return ResponseEntity.ok().body(204);
+        }
+        return ResponseEntity.ok(scaffMap);
     }
 
     @PostMapping
