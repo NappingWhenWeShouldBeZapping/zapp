@@ -25,9 +25,7 @@ jobs:
           cache: 'maven'
 
       - name: Build CLI App
-        env:
-          SERVER_DOMAIN: ${{ vars.SERVER_DOMAIN }}
-        run: mvn clean install -DGOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID}} -DGOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_SECRET }} -Dapi.server-domain=${{ vars.SERVER_DOMAIN }}
+        run: mvn clean package -DGOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID}} -DGOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_SECRET }}
         working-directory: ./cli
 
       - name: Upload Jar

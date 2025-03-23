@@ -1,30 +1,16 @@
 package com.scaffoldcli.zapp.ServerAccess;
 
-import jakarta.annotation.PostConstruct;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-
-@Component
 public class AppUrls {
-
-    @Value("${api.server-domain}")
-    private String serverDomain;
-
     private static final String client = "http://localhost:8001/";
-    private static String staticServerDomain;
+    private static final String server="http://ec2-13-246-5-145.af-south-1.compute.amazonaws.com:8080/";
     private static final String googleTokenInfo = "https://oauth2.googleapis.com/tokeninfo?access_token=";
-
-    @PostConstruct
-    public void init() {
-        staticServerDomain = serverDomain;
-    }
 
     public static String getClient(){
         return client;
     }
 
     public static String getServer(){
-        return staticServerDomain;
+        return server;
     }
 
     public static String getGoogleTokenInfoUrl(){
