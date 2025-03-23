@@ -1,4 +1,4 @@
-package com.scaffoldcli.zapp.ServerAccess;
+package com.scaffoldcli.zapp.auth;
 
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;

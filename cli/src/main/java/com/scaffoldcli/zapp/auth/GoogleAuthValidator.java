@@ -1,8 +1,7 @@
 package com.scaffoldcli.zapp.auth;
 
+import com.scaffoldcli.zapp.ZappApplication;
 import org.springframework.web.client.RestTemplate;
-
-import com.scaffoldcli.zapp.ServerAccess.AppUrls;
 
 import org.springframework.web.client.RestClientException;
 import org.springframework.http.ResponseEntity;
@@ -12,7 +11,7 @@ public class GoogleAuthValidator {
 
     public static boolean isValidGoogleToken(String accessToken) {
         try {
-            String url = AppUrls.getGoogleTokenInfoUrl() + accessToken;
+            String url = ZappApplication.AppUrls.getGoogleTokenInfoUrl() + accessToken;
             ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
 
             return response.getStatusCode().is2xxSuccessful();

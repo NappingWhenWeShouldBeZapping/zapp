@@ -1,5 +1,6 @@
 package com.scaffoldcli.zapp.ServerAccess;
 
+import com.scaffoldcli.zapp.auth.AppUrls;
 import com.scaffoldcli.zapp.auth.AuthDetails;
 import com.scaffoldcli.zapp.auth.AutheticateUser;
 

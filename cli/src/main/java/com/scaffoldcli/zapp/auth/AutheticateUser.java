@@ -1,6 +1,6 @@
 package com.scaffoldcli.zapp.auth;
 
-import com.scaffoldcli.zapp.ServerAccess.AppUrls;
+import com.scaffoldcli.zapp.ZappApplication;
 import com.scaffoldcli.zapp.lib.Text;
 import com.scaffoldcli.zapp.lib.Text.Colour;
 
@@ -22,7 +22,7 @@ public class AutheticateUser {
 
     public static boolean authenticateUser() {
         try {
-            new ProcessBuilder("cmd", "/c", "start", AppUrls.getClient()).start();
+            new ProcessBuilder("cmd", "/c", "start", ZappApplication.AppUrls.getClient()).start();
 
             int tryCount = 30;
             while (!isUserAutheticated() && tryCount > 0) {
@@ -31,7 +31,7 @@ public class AutheticateUser {
             }
 
             if (isUserAutheticated()) {
-                new ProcessBuilder("cmd", "/c", "start", AppUrls.getClient() + "login/success").start();
+                new ProcessBuilder("cmd", "/c", "start", ZappApplication.AppUrls.getClient() + "login/success").start();
             } else {
                 Text.print("Authentication failed after multiple attempts.", Colour.bright_red);
                 System.exit(1);
