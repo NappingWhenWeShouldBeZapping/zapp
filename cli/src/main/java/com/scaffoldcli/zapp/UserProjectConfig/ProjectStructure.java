@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.scaffoldcli.zapp.ServerAccess.ServerAccessHandler;
 
 public class ProjectStructure {
+
     public static Map<String,String> getScaffOptions(String scaffId){
         String scaffOptions = ServerAccessHandler.getScaffServerRequest(scaffId+"/options");
         Map<String,String> scaffOptionNames = getScaffIdNameMap(scaffOptions);

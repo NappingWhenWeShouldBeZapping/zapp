@@ -2,20 +2,24 @@ package com.scaffoldcli.zapp.commands;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.scaffoldcli.zapp.ServerAccess.ServerAccessHandler;
+import com.scaffoldcli.zapp.lib.Text;
+import com.scaffoldcli.zapp.lib.Text.Colour;
+import com.scaffoldcli.zapp.net.ZappAPIRequest;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.net.http.HttpResponse;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
-public class Create {
-    // Set of common directories/files to ignore
+public class CreateScaffCommand implements Command {
     private static final Set<String> IGNORED_DIRECTORIES = new HashSet<>();
     private static final List<FileData> fileDataList = new ArrayList<>();
     private static final Map<String, Object> jsonMap = new HashMap<>();
     private static final Scanner scanner = new Scanner(System.in);
-
     private static final Set<String> IGNORED_EXTENSIONS = new HashSet<>(Arrays.asList(
             "bin", "exe", "dll", "class", "jpg", "jpeg", "png", "gif", "bmp", "mp3", "mp4", "avi", "zip", "tar", "gz",
             "rar", "iso", "apk", "exe", "dmg",
@@ -26,23 +30,12 @@ public class Create {
         IGNORED_DIRECTORIES.add("node_modules");
         IGNORED_DIRECTORIES.add(".git");
         IGNORED_DIRECTORIES.add(".idea");
-        IGNORED_DIRECTORIES.add("zapp.log");
         IGNORED_DIRECTORIES.add(".vscode");
         IGNORED_DIRECTORIES.add(".DS_Store");
         IGNORED_DIRECTORIES.add("Thumbs.db");
     }
 
-    public void run() {
-        String directoryPath = System.getProperty("user.dir");
-
-        File directory = new File(directoryPath);
-        if (directory.exists() && directory.isDirectory()) {
-            readFilesRecursively(directory, directoryPath);
-            writeDataToJsonFile();
-        } else {
-            System.out.println("Provided path is not a valid directory.");
-        }
-    }
+    private String[] options;
 
     private static void readFilesRecursively(File dir, String rootPath) {
         File[] files = dir.listFiles();
@@ -81,27 +74,25 @@ public class Create {
     }
 
     private static void processFile(File file, String rootPath) {
+        String relativePath = null;
         try {
-            String relativePath = getRelativePath(file, rootPath);
-            StringBuilder contentBuilder = new StringBuilder();
-
-            jsonMap.put("parent", null);
-
-            try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-                String line;
-                while ((line = br.readLine()) != null) {
-                    contentBuilder.append(line).append("\n");
-                }
-            } catch (IOException e) {
-                System.err.println("Error reading file: " + relativePath);
-                e.printStackTrace();
-            }
-            fileDataList.add(new FileData(relativePath, contentBuilder.toString()));
-
-        } catch (Exception e) {
-            System.err.println("Error processing file: " + file.getAbsolutePath());
-            e.printStackTrace();
+            relativePath = getRelativePath(file, rootPath);
+        } catch (IOException e) {
+            Text.print("Error reading file: " + relativePath, Colour.bright_red, true);
         }
+
+        jsonMap.put("parent", null);
+
+        StringBuilder contentBuilder = new StringBuilder();
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                contentBuilder.append(line).append("\n");
+            }
+        } catch (IOException e) {
+            Text.print("Error reading file: " + relativePath, Colour.bright_red, true);
+        }
+        fileDataList.add(new CreateScaffCommand.FileData(relativePath, contentBuilder.toString()));
     }
 
     private static String getRelativePath(File file, String rootPath) throws IOException {
@@ -110,42 +101,56 @@ public class Create {
         return root.relativize(filePath).toString().replaceAll("\\\\", "/");
     }
 
-    private static void writeDataToJsonFile() {
+    private static String fileDataToJson() {
         Gson gson = new GsonBuilder()
                 .setPrettyPrinting()
                 .disableHtmlEscaping()
                 .create();
-
         jsonMap.put("insertions", fileDataList);
+        return gson.toJson(jsonMap);
+    }
 
-        String scaffName = getScaffName();
-        String scaffDescr = getScaffDescr();
+    @Override
+    public void run() {
+        String scaffName = Text.input("What do you want to call your scaff?");
+        String scaffDescr = Text.input("Give you scaff a brief description.");
 
         jsonMap.put("scaffName", scaffName);
         jsonMap.put("scaffDescr", scaffDescr);
 
-        String json = gson.toJson(jsonMap);
+        String directoryPath = System.getProperty("user.dir");
 
-        ServerAccessHandler.createScaffServerRequest(json);
+        File directory = new File(directoryPath);
+        if (directory.exists() && directory.isDirectory()) {
+            readFilesRecursively(directory, directoryPath);
+            String fileDataJson = fileDataToJson();
+            sendCreateScaffRequest(fileDataJson);
+        } else {
+            Text.print("Provided path is not a valid directory.", Colour.bright_red, true);
+        }
     }
 
-    public static String getScaffName() {
-        System.out.print("New scaff name:");
-        String name = "";
-        while (name.isEmpty()) {
-            name = scanner.nextLine();
-        }
-        return name;
-    }
+    private void sendCreateScaffRequest(String json) {
+        HttpResponse<String> response = new ZappAPIRequest().post("/scaff/", json);
 
-    public static String getScaffDescr() {
-        System.out.print("Give a quick description:");
-        String descr = "";
-        while (descr.isEmpty()) {
-            descr = scanner.nextLine();
+        switch (response.statusCode()) {
+            case 201:
+                Text.print("Your scaff was create successfully.", Colour.bright_green, true);
+                break;
+            case 400:
+                Text.print("Malformed request. Please try again.", Colour.bright_red);
+                break;
+            case 404:
+                Text.print("Could not find the requested resource on the server. Please try again.", Colour.bright_red);
+                break;
+            case 500:
+                Text.print("Internal server error. Please try again later.", Colour.bright_red);
+                break;
+            default:
+                Text.print("Could not create your scaff. Please try again.", Colour.bright_red);
+                break;
         }
-        scanner.close();
-        return descr;
+        System.exit(0);
     }
 
     private static class FileData {

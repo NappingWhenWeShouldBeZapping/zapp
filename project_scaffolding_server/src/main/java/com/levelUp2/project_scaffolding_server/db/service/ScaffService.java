@@ -30,6 +30,10 @@ public class ScaffService {
         return scaffRepository.findAll();
     }
 
+    public List<Scaff> getAllParentScaffs() {
+        return scaffRepository.findByParentIdExcludingSelf("00000000000000000000000000000000", "00000000000000000000000000000000");
+    }
+
     public Optional<Scaff> getScaffById(String id) {
         return scaffRepository.findById(id);
     }

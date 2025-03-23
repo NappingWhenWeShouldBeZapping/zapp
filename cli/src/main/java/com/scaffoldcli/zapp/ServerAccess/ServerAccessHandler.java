@@ -1,7 +1,10 @@
 package com.scaffoldcli.zapp.ServerAccess;
 
-import com.scaffoldcli.zapp.ZappApplication;
+import com.scaffoldcli.zapp.auth.AuthDetails;
 import com.scaffoldcli.zapp.auth.AutheticateUser;
+
+import com.scaffoldcli.zapp.models.GeminiResponse;
+import com.scaffoldcli.zapp.models.ProjectSpecification;
 import org.springframework.http.*;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
@@ -9,12 +12,15 @@ import org.springframework.web.client.RestTemplate;
 
 public class ServerAccessHandler {
 
+    private static final String baseServerURL = AppUrls.getServer();
+
     private static String reqScaff(String scaffId) {
         RestTemplate restTemplate = new RestTemplate();
-        String url = ZappApplication.ServerUrl + "/scaff/" + scaffId;
+        System.out.println(baseServerURL);
+        String url = baseServerURL + "/scaff/" + scaffId;
 
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + ZappApplication.AccessToken);
+        headers.set("Authorization", "Bearer " + AuthDetails.getAccessToken());
 
         ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(headers), String.class);
 
@@ -51,26 +57,24 @@ public class ServerAccessHandler {
         return res;
     }
 
-    public static String createAITemplate(String jsonBody) {
+    public static ResponseEntity<GeminiResponse> createAITemplate(ProjectSpecification jsonBody) {
         RestTemplate restTemplate = new RestTemplate();
-        String url = ZappApplication.ServerUrl + "/gemini/template";
+        String url = baseServerURL + "/gemini/template";
 
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + ZappApplication.AccessToken);
+        headers.set("Authorization", "Bearer " + AuthDetails.getAccessToken());
 
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        HttpEntity<String> entity = new HttpEntity<>(jsonBody, headers);
+        HttpEntity<ProjectSpecification> entity = new HttpEntity<>(jsonBody, headers);
 
 
-        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
-
-        return response.getBody();
+        return restTemplate.exchange(url, HttpMethod.POST, entity, GeminiResponse.class);
     }
 
 
 
-    public static void createScaffServerRequest(String jsonBody) {
+    public void createScaffServerRequest(String jsonBody) {
         try {
             AutheticateUser.triggerUserAutheticationFlow();
             boolean authenticated = false;
@@ -79,9 +83,9 @@ public class ServerAccessHandler {
             }
             if (authenticated) {
                 System.out.println("\n\n\t\u001B[92m> Authenticated - launching CLI\u001B[0m\n\n");
-                Integer statusCode = createScaff(jsonBody);
+                int statusCode = createScaff(jsonBody);
 
-                if (statusCode.equals(201)) {
+                if (statusCode == 201) {
                     System.out.println("\n\n\u001B[92m> Your scaff was created successfully\u001B[0m\n\n");
                     System.exit(0);
                 }
@@ -95,12 +99,12 @@ public class ServerAccessHandler {
         }
     }
 
-    private static Integer createScaff(String jsonBody) {
+    private int createScaff(String jsonBody) {
         RestTemplate restTemplate = new RestTemplate();
-        String apiUrl = ZappApplication.ServerUrl + "scaff/create";
+        String apiUrl = baseServerURL + "scaff/create";
 
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + ZappApplication.AccessToken);
+        headers.set("Authorization", "Bearer " + AuthDetails.getAccessToken());
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         HttpEntity<String> entity = new HttpEntity<>(jsonBody, headers);

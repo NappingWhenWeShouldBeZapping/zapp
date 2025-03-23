@@ -1,66 +1,53 @@
 package com.scaffoldcli.zapp.auth;
 
+import com.scaffoldcli.zapp.ServerAccess.AppUrls;
+import com.scaffoldcli.zapp.lib.Text;
+import com.scaffoldcli.zapp.lib.Text.Colour;
+
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-
-import org.springframework.web.client.RestTemplate;
-
-import com.scaffoldcli.zapp.ZappApplication;
 
 public class AutheticateUser {
 
-    public static void triggerUserAutheticationFlow(){
-        if(!isUserAutheticated()){ 
-            System.out.println("You are not autheticated. Open your brower to login...");
-            if(authenticateUser()){
-                System.out.println("Your are now logged in.");
-            }
-            else {
-                System.out.println("We could not log you in, please try again.");
+    public static void triggerUserAutheticationFlow() {
+        if (!isUserAutheticated()) {
+            Text.print("You are not authenticated. Open your browser to login...", Colour.yellow);
+            if (authenticateUser()) {
+                Text.print("Your are now logged in.", Colour.bright_green);
+            } else {
+                Text.print("We could not log you in, please try again.", Colour.bright_red);
                 System.exit(1);
             }
         }
     }
 
-    @SuppressWarnings("deprecation")
-    public static Boolean authenticateUser(){
+    public static boolean authenticateUser() {
         try {
-            Runtime.getRuntime().exec("cmd /c \"start " + ZappApplication.ClientUrl + "\"");
-            Integer tryCount = 30;
+            new ProcessBuilder("cmd", "/c", "start", AppUrls.getClient()).start();
+
+            int tryCount = 30;
             while (!isUserAutheticated() && tryCount > 0) {
-                --tryCount;	
+                --tryCount;
+                Thread.sleep(500);
             }
+
             if (isUserAutheticated()) {
-                Runtime.getRuntime().exec("cmd /c \"start " + ZappApplication.ClientUrl + "login/success\"");
+                new ProcessBuilder("cmd", "/c", "start", AppUrls.getClient() + "login/success").start();
             } else {
-                System.err.println("Authentication failed after multiple attempts.");
+                Text.print("Authentication failed after multiple attempts.", Colour.bright_red);
                 System.exit(1);
             }
-        } catch (IOException e) {
-            System.err.println("Please authenticate your google account");
+        } catch (IOException | SecurityException | InterruptedException e) {
+            Text.print("Please authenticate your Google account", Colour.bright_red);
             System.exit(1);
         }
         return isUserAutheticated();
     }
 
-    public static Boolean isUserAutheticated () {
-        try { Thread.sleep(2000); } catch (InterruptedException e) { /* zzZZ */ };
-
-        if (ZappApplication.AccessToken == null){
-            try{
-                ZappApplication.AccessToken = Files.readString(Paths.get(ZappApplication.AccessTokenFilePath));
-            } catch (IOException e) {
-                return false;
-            }
-        }
-        String userInfoUrl = "https://www.googleapis.com/oauth2/v3/userinfo";
-        RestTemplate restTemplate = new RestTemplate();
+    public static boolean isUserAutheticated() {
         try {
-            restTemplate.getForObject(userInfoUrl + "?access_token=" + ZappApplication.AccessToken, String.class);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
+            Thread.sleep(2000);
+        } catch (InterruptedException e) { /* zzZZ */ }
+
+        return GoogleAuthValidator.isValidGoogleToken(AuthDetails.getAccessToken());
     }
 }
