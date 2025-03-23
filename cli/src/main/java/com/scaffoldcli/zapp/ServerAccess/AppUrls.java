@@ -1,6 +1,12 @@
 package com.scaffoldcli.zapp.ServerAccess;
 
+import org.springframework.beans.factory.annotation.Value;
+
 public class AppUrls {
+
+    @Value("${api.server-domain}")
+    private static String serverDomain;
+
     private static final String client = "http://localhost:8001/";
     private static final String server="http://localhost:8002/";
     private static final String googleTokenInfo = "https://oauth2.googleapis.com/tokeninfo?access_token=";
@@ -10,7 +16,7 @@ public class AppUrls {
     }
 
     public static String getServer(){
-        return server;
+        return serverDomain;
     }
 
     public static String getGoogleTokenInfoUrl(){
