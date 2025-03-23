@@ -20,22 +20,24 @@ public class AutheticateUser {
         }
     }
 
-    @SuppressWarnings("deprecation")
     public static boolean authenticateUser() {
         try {
-            Runtime.getRuntime().exec("cmd /c \"start " + AppUrls.getClient() + "\"");
-            Integer tryCount = 30;
+            new ProcessBuilder("cmd", "/c", "start", AppUrls.getClient()).start();
+
+            int tryCount = 30;
             while (!isUserAutheticated() && tryCount > 0) {
                 --tryCount;
+                Thread.sleep(500);
             }
+
             if (isUserAutheticated()) {
-                Runtime.getRuntime().exec("cmd /c \"start " + AppUrls.getClient() + "login/success\"");
+                new ProcessBuilder("cmd", "/c", "start", AppUrls.getClient() + "login/success").start();
             } else {
                 Text.print("Authentication failed after multiple attempts.", Colour.bright_red);
                 System.exit(1);
             }
-        } catch (IOException | SecurityException e) {
-            Text.print("Please authenticate your google account", Colour.bright_red);
+        } catch (IOException | SecurityException | InterruptedException e) {
+            Text.print("Please authenticate your Google account", Colour.bright_red);
             System.exit(1);
         }
         return isUserAutheticated();
