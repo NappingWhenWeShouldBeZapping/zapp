@@ -107,11 +107,11 @@ public class Init implements Command {
         }
     }
 
-    boolean loadOptions() {
+    private boolean loadOptions() {
         this.itemToScaff = new HashMap<String, String>();
 
         Text.print("Waiting for server response...", Colour.bright_yellow, true);
-        HttpResponse<String> response = new ZappAPIRequest().get("/scaff/");
+        HttpResponse<String> response = new ZappAPIRequest().get("/scaff");
 
         this.items = GetScaffsResponse.fromJson(response.body());
 
@@ -130,6 +130,8 @@ public class Init implements Command {
         if (response.statusCode() == 200) {
             if (Objects.equals(response.body(), "204")) {
                 fetchRender(scaffId);
+                System.out.println("\u001B[?25h");
+                System.out.flush();
                 System.exit(0);
             } else {
                 handleMoreOptions(response.body());
