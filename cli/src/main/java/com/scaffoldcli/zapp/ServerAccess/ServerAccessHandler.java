@@ -12,10 +12,12 @@ import org.springframework.web.client.RestTemplate;
 
 public class ServerAccessHandler {
 
+    private static final String baseServerURL = AppUrls.getServer();
+
     private static String reqScaff(String scaffId) {
         RestTemplate restTemplate = new RestTemplate();
-        System.out.println(AppUrls.getServer());
-        String url = AppUrls.getServer() + "/scaff/" + scaffId;
+        System.out.println(baseServerURL);
+        String url = baseServerURL + "/scaff/" + scaffId;
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + AuthDetails.getAccessToken());
@@ -57,7 +59,7 @@ public class ServerAccessHandler {
 
     public static ResponseEntity<GeminiResponse> createAITemplate(ProjectSpecification jsonBody) {
         RestTemplate restTemplate = new RestTemplate();
-        String url = AppUrls.getServer() + "/gemini/template";
+        String url = baseServerURL + "/gemini/template";
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + AuthDetails.getAccessToken());
@@ -99,7 +101,7 @@ public class ServerAccessHandler {
 
     private int createScaff(String jsonBody) {
         RestTemplate restTemplate = new RestTemplate();
-        String apiUrl = AppUrls.getServer() + "scaff/create";
+        String apiUrl = baseServerURL + "scaff/create";
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + AuthDetails.getAccessToken());
