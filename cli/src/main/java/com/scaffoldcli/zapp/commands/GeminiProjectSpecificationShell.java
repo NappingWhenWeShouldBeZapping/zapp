@@ -11,8 +11,6 @@ import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.shell.standard.ShellComponent;
-import org.springframework.shell.standard.ShellMethod;
 
 import java.io.IOException;
 import java.util.Scanner;
@@ -23,10 +21,10 @@ public class GeminiProjectSpecificationShell implements Command {
     private ProjectSpecification projectSpecification = new ProjectSpecification();
     private final AITemplateService aiService;
 
-    public GeminiProjectSpecificationShell(AITemplateService aiService) {
+    public GeminiProjectSpecificationShell() {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
-        this.aiService = aiService;
+        this.aiService = new AITemplateService();
 
     }
 
