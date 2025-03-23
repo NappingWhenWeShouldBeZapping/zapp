@@ -1,6 +1,5 @@
 package com.scaffoldcli.zapp;
 
-import com.scaffoldcli.zapp.commands.AICliCommand;
 import com.scaffoldcli.zapp.commands.CreateScaffCommand;
 import com.scaffoldcli.zapp.commands.Init;
 import com.scaffoldcli.zapp.lib.Text;
@@ -39,12 +38,6 @@ public class CLICommand extends AbstractShellComponent {
         checkUserAuth();
         CreateScaffCommand cli = new CreateScaffCommand();
         cli.run();
-    }
-
-    @ShellMethod
-    public void ai() {
-        AICliCommand aiCli = new AICliCommand(terminalUIBuilder);
-        aiCli.init();
     }
 
 }

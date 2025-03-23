@@ -3,6 +3,8 @@ package com.scaffoldcli.zapp.ServerAccess;
 import com.scaffoldcli.zapp.auth.AuthDetails;
 import com.scaffoldcli.zapp.auth.AutheticateUser;
 
+import com.scaffoldcli.zapp.models.GeminiResponse;
+import com.scaffoldcli.zapp.models.ProjectSpecification;
 import org.springframework.http.*;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
@@ -53,7 +55,7 @@ public class ServerAccessHandler {
         return res;
     }
 
-    public static String createAITemplate(String jsonBody) {
+    public static ResponseEntity<GeminiResponse> createAITemplate(ProjectSpecification jsonBody) {
         RestTemplate restTemplate = new RestTemplate();
         String url = AppUrls.getServer() + "/gemini/template";
 
@@ -62,12 +64,10 @@ public class ServerAccessHandler {
 
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        HttpEntity<String> entity = new HttpEntity<>(jsonBody, headers);
+        HttpEntity<ProjectSpecification> entity = new HttpEntity<>(jsonBody, headers);
 
 
-        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
-
-        return response.getBody();
+        return restTemplate.exchange(url, HttpMethod.POST, entity, GeminiResponse.class);
     }
 
 
