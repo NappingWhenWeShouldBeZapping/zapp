@@ -141,46 +141,4 @@ public class ServerAccessHandler {
             return "\u001B[91m> Unexpected error occurred while deleting scaffold: " + e.getMessage() + "\u001B[0m";
         }
     }
-
-    // public static void deleteScaffServerRequest(String jsonBody) {
-    //     try {
-    //         AutheticateUser.triggerUserAutheticationFlow();
-    //         boolean authenticated = false;
-    //         for (int i = 0; i < 30 && !authenticated; i++) {
-    //             if (AutheticateUser.isUserAutheticated()) authenticated = true;
-    //         }
-    //         if (authenticated) {
-    //             System.out.println("\n\n\t\u001B[92m> Authenticated - attempting to delete scaffold\u001B[0m\n\n");
-    //             Integer statusCode = deleteScaff(jsonBody);
-
-    //             if (statusCode.equals(200)) {
-    //                 System.out.println("\n\n\u001B[92m> Scaffold deleted successfully\u001B[0m\n\n");
-    //             } else {
-    //                 System.out.println("\n\n\u001B[91m> Failed to delete scaffold\u001B[0m\n\n");
-    //             }
-    //         } else {
-    //             System.out.println("\n\n\t\u001B[91m> Failed to authenticate user - exiting\u001B[0m\n\n");
-    //             System.exit(0);
-    //         }
-    //     } catch (Exception e) {
-    //         System.out.println("\n\n\t\u001B[91m> Failed connecting to API - exiting\u001B[0m\n\n");
-    //         System.exit(1);
-    //     }
-    // }
-
-    // private static Integer deleteScaff(String jsonBody) {
-    //     RestTemplate restTemplate = new RestTemplate();
-    //     String apiUrl = ZappApplication.ServerUrl + "scaff/delete";
-
-    //     HttpHeaders headers = new HttpHeaders();
-    //     headers.set("Authorization", "Bearer " + ZappApplication.AccessToken);
-    //     headers.setContentType(MediaType.APPLICATION_JSON);
-
-    //     HttpEntity<String> entity = new HttpEntity<>(jsonBody, headers);
-
-    //     System.out.println("\n\n\tDeleting scaffold...\n\n");
-
-    //     ResponseEntity<String> response = restTemplate.exchange(apiUrl, HttpMethod.DELETE, entity, String.class);
-    //     return response.getStatusCode().value();
-    // }
 }
