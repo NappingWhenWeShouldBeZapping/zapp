@@ -7,14 +7,10 @@ import org.springframework.security.oauth2.client.authentication.OAuth2Authentic
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
-import com.scaffoldcli.zapp.ZappApplication;
-
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 @Component
 public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccessHandler {
@@ -37,7 +33,7 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
                 oauthToken.getName()
         );
                                     
-        ZappApplication.AccessToken = authorizedClient.getAccessToken().getTokenValue();
-        Files.write(Paths.get(ZappApplication.AccessTokenFilePath), ZappApplication.AccessToken.getBytes());
+        String accessToken = authorizedClient.getAccessToken().getTokenValue();
+        AuthDetails.setAccessToken(accessToken);
     }
 }
