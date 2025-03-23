@@ -1,8 +1,7 @@
 package com.scaffoldcli.zapp.auth;
 
-import org.springframework.web.client.RestTemplate;
-
 import com.scaffoldcli.zapp.ServerAccess.AppUrls;
+import org.springframework.web.client.RestTemplate;
 
 import org.springframework.web.client.RestClientException;
 import org.springframework.http.ResponseEntity;

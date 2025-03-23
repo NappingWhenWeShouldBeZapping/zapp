@@ -9,10 +9,10 @@ import org.springframework.shell.command.annotation.CommandScan;
 @CommandScan
 public class ZappApplication {
 
-	public static void main(String[] args) throws Exception {
-		//========== Spring init ==========//
-		SpringApplication application = new SpringApplication(ZappApplication.class);
-		application.setBannerMode(Mode.OFF);
-		application.run(args);
-	}
+    public static void main(String[] args) throws Exception {
+        //========== Spring init ==========//
+        SpringApplication application = new SpringApplication(ZappApplication.class);
+        application.setBannerMode(Mode.OFF);
+        application.run(args);
+    }
 }

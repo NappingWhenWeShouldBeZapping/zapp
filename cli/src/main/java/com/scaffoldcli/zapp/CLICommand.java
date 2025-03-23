@@ -1,8 +1,8 @@
 package com.scaffoldcli.zapp;
 
 import com.scaffoldcli.zapp.auth.AutheticateUser;
-import com.scaffoldcli.zapp.commands.AICliCommand;
 import com.scaffoldcli.zapp.commands.CreateScaffCommand;
+import com.scaffoldcli.zapp.commands.GeminiProjectSpecificationShell;
 import com.scaffoldcli.zapp.commands.Init;
 import com.scaffoldcli.zapp.lib.Text;
 import com.scaffoldcli.zapp.net.ZappAPIRequest;
@@ -41,9 +41,10 @@ public class CLICommand extends AbstractShellComponent {
     }
 
     @ShellMethod
-    public void ai() {
-        AICliCommand aiCli = new AICliCommand(terminalUIBuilder);
-        aiCli.init();
+    public void gemini() {
+        AutheticateUser.triggerUserAutheticationFlow();
+        GeminiProjectSpecificationShell cli = new GeminiProjectSpecificationShell();
+        cli.run();
     }
 
 }
