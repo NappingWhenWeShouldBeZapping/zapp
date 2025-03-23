@@ -15,21 +15,29 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Map;
 
+import static com.scaffoldcli.zapp.auth.AuthDetails.getAccessToken;
+import static com.scaffoldcli.zapp.auth.AutheticateUser.triggerUserAutheticationFlow;
+
 public class ZappAPIRequest {
-    @Getter
-    @Setter
-    private static String authToken = "";
-    private final String baseURL = "http://13.245.75.144:8080/";
+    private final String baseURL = "http://localhost:8002/";
     private final HttpClient client = HttpClient.newHttpClient();
     private final Gson gson = new GsonBuilder()
             .setPrettyPrinting()
             .disableHtmlEscaping()
             .create();
+    @Getter
+    @Setter
+    private String authToken;
 
     public ZappAPIRequest() {
-//        if (authToken.isEmpty() || authToken.isBlank() || authToken == null) {
-//            throw new UserNotAuthenticatedException();
-//        }
+    }
+
+    private void checkUserAuth() {
+        String authToken = getAccessToken();
+        if (authToken == null || authToken.isEmpty()) {
+            triggerUserAutheticationFlow();
+        }
+        this.authToken = authToken;
     }
 
     public HttpResponse<String> get(String endpoint) {
@@ -54,6 +62,8 @@ public class ZappAPIRequest {
     }
 
     public HttpResponse<String> post(String endpoint, String body) {
+        checkUserAuth();
+
         endpoint = replaceFirstSlash(endpoint);
 
         Map<String, Object> req = convertJsonStringToMap(body);
@@ -84,6 +94,8 @@ public class ZappAPIRequest {
     }
 
     public HttpResponse<String> put(String endpoint, Map<String, Object> body) throws InterruptedException, IOException {
+        checkUserAuth();
+
         endpoint = replaceFirstSlash(endpoint);
 
         HttpRequest request = HttpRequest.newBuilder()
@@ -97,6 +109,8 @@ public class ZappAPIRequest {
     }
 
     public HttpResponse<String> delete(String endpoint) throws InterruptedException, IOException {
+        checkUserAuth();
+
         endpoint = replaceFirstSlash(endpoint);
 
         HttpRequest request = HttpRequest.newBuilder()

@@ -44,8 +44,6 @@ public class CreateScaffRequest {
         private String relativePath;
         private String content;
 
-        // Getters and Setters
-
         public String getRelativePath() {
             return relativePath;
         }
