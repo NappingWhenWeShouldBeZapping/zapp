@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - master
-      - add-gemini-code-generation
   workflow_dispatch:
 
 jobs:
