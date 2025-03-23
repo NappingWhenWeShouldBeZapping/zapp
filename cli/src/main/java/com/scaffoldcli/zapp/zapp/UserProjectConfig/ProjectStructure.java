@@ -16,6 +16,8 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.stringtemplate.v4.compiler.CodeGenerator.primary_return;
+
 public class ProjectStructure {
     private static Pattern TEMPLATE_VAR = Pattern.compile("<<<(\\w+)>>>");
 
@@ -94,8 +96,16 @@ public class ProjectStructure {
         }
         return content;
     }
-
     public static void renderFileSystem(String parentDir, JsonNode filesNode, Map<String, String> varSubs) {
+        // Create project folder
+        File dir = new File(parentDir);
+        if (!dir.exists()) { dir.mkdirs(); }
+        
+        // Render into folder
+        recRenderFileSystem(parentDir, filesNode, varSubs);
+    }
+
+    private static void recRenderFileSystem(String parentDir, JsonNode filesNode, Map<String, String> varSubs) {
         Iterator<Map.Entry<String, JsonNode>> fields = filesNode.fields();
 
         while (fields.hasNext()) {
@@ -112,8 +122,12 @@ public class ProjectStructure {
                 String fileContent = value.asText();
                 for (var e : varSubs.entrySet()) { fileContent = substituteVar(fileContent, e.getKey(), e.getValue()); } // Sub all vars
 
-                try { Files.write(Paths.get(objPath), fileContent.getBytes()); } // Write file
-                catch (IOException e) { e.printStackTrace(); }
+                try {
+                    Files.write(Paths.get(objPath), fileContent.getBytes());
+                } // Write file
+                catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }

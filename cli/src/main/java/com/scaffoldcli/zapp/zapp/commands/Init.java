@@ -19,24 +19,18 @@ import org.springframework.shell.component.view.control.ListView;
 import org.springframework.shell.component.view.control.ListView.ItemStyle;
 import org.springframework.shell.component.view.control.ListView.ListViewOpenSelectedItemEvent;
 import org.springframework.shell.component.view.control.ListView.ListViewSelectedItemChangedEvent;
-import org.springframework.shell.component.view.control.ProgressView;
 import org.springframework.shell.component.view.control.InputView.InputViewTextChangeEvent;
-import org.springframework.shell.component.view.control.ProgressView.ProgressViewItem;
 import org.springframework.shell.component.view.event.EventLoop;
 import org.springframework.shell.component.view.event.KeyEvent;
-import org.springframework.shell.component.view.screen.Color;
-import org.springframework.shell.geom.HorizontalAlign;
-import org.springframework.shell.style.ThemeRegistry;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.Box;
-
 public class Init {
     static final String ROOT_SCAFF = "00000000000000000000000000000000";
+    static final String DEFAULT_PROJECT_NAME = "MyProj";
     // Ref type helper for deep nested event generics
     private final static ParameterizedTypeReference<ListViewSelectedItemChangedEvent<String>> LISTVIEW_STRING_SELECT
         = new ParameterizedTypeReference<ListViewSelectedItemChangedEvent<String>>() {};
@@ -60,7 +54,6 @@ public class Init {
     List<String> items = new ArrayList<String>();
     Map<String, String> itemToScaff;
     private String currentScaffId = "";
-    private String projectName = "MyProj";
     private Map<String, String> varSubs = new HashMap<>();
 
     public Init(TerminalUIBuilder termUIBuilder) {
@@ -159,7 +152,6 @@ public class Init {
                         nameInput.setTitle(" Enter project name - Must be non-empty");
                         return;
                     }
-                    projectName = txt;
                     nameInput.setTitle(" Enter project name - " + txt);
                     ui.setFocus(list);
                 }
@@ -238,13 +230,13 @@ public class Init {
 
             //-- Generate project files --//
             String inp = nameInput.getInputText().trim();
-            String pname = inp != "" ? inp : "MyProj";
+            String pname = (inp.length() == 0 ? DEFAULT_PROJECT_NAME : inp);
             ProjectStructure.renderFileSystem(pname, renderedBody.path("files"), varSubs);
 
             //-- Quit --//
             eventLoop.dispatch(ShellMessageBuilder.ofInterrupt());
             System.out.print("\u001B[H\u001B[2J\u001B[?25h"); // Clear screen & reset cursor pos + visibility
-            System.out.println("\n\n\t\u001B[92m> Project created in " + pname + "/\u001B[0m\n\n");
+            System.out.println("\t\u001B[92m> Project created in " + pname + "/\u001B[0m\n");
             System.out.flush();
             System.exit(0);
             return;
