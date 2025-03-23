@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+  workflow_dispatch:
 
 jobs:
   build:
@@ -21,11 +22,39 @@ jobs:
           cache: 'maven'
 
       - name: Build CLI App
-        run: mvn clean package -DskipTests
+        run: mvn clean package -DskipTests -DGOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID}} -DGOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_SECRET }} -DSERVER_DOMAIN=${{ vars.SERVER_DOMAIN }}
         working-directory: ./cli
 
       - name: Upload Jar
         uses: actions/upload-artifact@v4
         with:
           name: zapp-cli.jar
-          path: /home/runner/work/zapp/zapp/cli/target/zapp-0.0.1-SNAPSHOT.jar
+          path: ./cli/target/zapp-0.0.1-SNAPSHOT.jar
+          retention-days: 7
+
+      - name: Create Release
+        uses: actions/create-release@v1
+        id: create_release
+        if: github.event_name == 'push'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ github.run_number }}
+          release_name: Release v${{ github.run_number }}
+          body: |
+            This is a new release of the Zapp CLI! # Customize the release description
+            - Includes bug fixes
+            - Added new features
+
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./cli/target/zapp-0.0.1-SNAPSHOT.jar
+          asset_name: zapp-cli.jar
+          asset_content_type: application/java-archive
