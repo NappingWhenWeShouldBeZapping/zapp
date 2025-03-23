@@ -18,7 +18,7 @@ import static com.scaffoldcli.zapp.auth.AutheticateUser.triggerUserAuthetication
 
 public class ZappAPIRequest {
     private static String authToken;
-    private final String baseURL = "http://localhost:8002/";
+    private final String baseURL = "http://13.246.35.49:8080/";
     private final HttpClient client = HttpClient.newHttpClient();
     private final Gson gson = new GsonBuilder()
             .setPrettyPrinting()

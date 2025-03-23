@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.scaffoldcli.zapp.lib.Text;
+import com.scaffoldcli.zapp.lib.Text.Colour;
 import com.scaffoldcli.zapp.models.GetScaffOptionsResponse;
 import com.scaffoldcli.zapp.models.GetScaffsResponse;
 import com.scaffoldcli.zapp.net.ZappAPIRequest;
@@ -34,7 +35,7 @@ public class Init implements Command {
             = new ParameterizedTypeReference<ListViewOpenSelectedItemEvent<String>>() {
     };
     private final TerminalUIBuilder terminalUIBuilder;
-    private List<String> test_items = new ArrayList<>();
+    private final List<String> test_items = new ArrayList<>();
     private List<GetScaffsResponse> items;
     private List<String> _items;
     private TerminalUI ui;
@@ -109,7 +110,9 @@ public class Init implements Command {
     boolean loadOptions() {
         this.itemToScaff = new HashMap<String, String>();
 
+        Text.print("Waiting for server response...", Colour.bright_yellow, true);
         HttpResponse<String> response = new ZappAPIRequest().get("/scaff/");
+
         this.items = GetScaffsResponse.fromJson(response.body());
 
         this.currentScaffId = this.items.getFirst().getId();
