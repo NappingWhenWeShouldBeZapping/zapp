@@ -9,8 +9,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class Controller {
     @GetMapping("login/success")
     public String getUserInfo(){
-        String response = String.format("Login success!");
-
-        return response;
+        return "Login success!";
     }
 }
