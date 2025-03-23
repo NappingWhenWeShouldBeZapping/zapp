@@ -6,6 +6,8 @@ import com.scaffoldcli.zapp.commands.GeminiProjectSpecificationShell;
 import com.scaffoldcli.zapp.commands.Init;
 import com.scaffoldcli.zapp.lib.Text;
 import com.scaffoldcli.zapp.net.ZappAPIRequest;
+import com.scaffoldcli.zapp.commands.Delete;
+
 import org.springframework.shell.component.view.TerminalUIBuilder;
 import org.springframework.shell.standard.AbstractShellComponent;
 import org.springframework.shell.standard.ShellComponent;
@@ -45,6 +47,11 @@ public class CLICommand extends AbstractShellComponent {
         AutheticateUser.triggerUserAutheticationFlow();
         GeminiProjectSpecificationShell cli = new GeminiProjectSpecificationShell();
         cli.run();
+	}
+	@ShellMethod
+	public void delete() {
+		Delete cli = new Delete();
+		cli.run();
     }
 
 }
