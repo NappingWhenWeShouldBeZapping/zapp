@@ -50,6 +50,7 @@ public class CLICommand extends AbstractShellComponent {
 	}
 	@ShellMethod
 	public void delete() {
+        AutheticateUser.triggerUserAutheticationFlow();
 		Delete cli = new Delete();
 		cli.run();
     }
