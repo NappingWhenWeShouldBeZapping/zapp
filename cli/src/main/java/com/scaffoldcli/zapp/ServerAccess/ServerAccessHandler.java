@@ -117,10 +117,10 @@ public class ServerAccessHandler {
 
     public static String deleteScaffServerRequest(String scaffId) {
         RestTemplate restTemplate = new RestTemplate();
-        String apiUrl = ZappApplication.ServerUrl + "/scaff/" + scaffId;
+        String apiUrl = AppUrls.getServer() + "/scaff/" + scaffId;
 
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + ZappApplication.AccessToken);
+        headers.set("Authorization", "Bearer " + AuthDetails.getAccessToken());
 
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
